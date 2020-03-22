@@ -11,19 +11,17 @@ func main() {
 	// Reads the WebAssembly module as bytes.
 	bytes, _ := wasm.ReadBytes("/Users/nstehr/wasm_test/as/build/untouched.wasm")
 
-	// Instantiates the WebAssembly module.
-	instance, _ := wasm.NewInstance(bytes)
-	defer instance.Close()
+	module, _ := wasm.Compile(bytes)
 
-	// instance 'Exports' map is empty, why?
+	// Read the WASI version required for this module
+	wasiVersion := wasm.WasiGetVersion(module)
+
+	log.Println(wasiVersion)
+	importObject := wasm.NewDefaultWasiImportObjectForVersion(wasiVersion)
+	instance, _ := module.InstantiateWithImportObject(importObject)
 	log.Println(instance)
-
-	// Gets the `add` exported function from the WebAssembly instance.
 	add := instance.Exports["add"]
-
-	// Calls that exported function with Go standard values. The WebAssembly
-	// types are inferred and values are casted automatically.
+	log.Println(add)
 	result, _ := add(5, 37)
-
-	fmt.Println(result) // 42!
+	fmt.Println(result)
 }
