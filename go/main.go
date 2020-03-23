@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Reads the WebAssembly module as bytes.
-	bytes, _ := wasm.ReadBytes("/Users/nstehr/wasm_test/as/build/untouched.wasm")
+	bytes, _ := wasm.ReadBytes("../as/build/untouched.wasm")
 
 	module, _ := wasm.Compile(bytes)
 
