@@ -8,7 +8,7 @@
     "as-wasi": "0.0.1"
   },
   "devDependencies": {
-    "assemblyscript": "^0.9.4"
+    "assemblyscript": "^0.14.10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
