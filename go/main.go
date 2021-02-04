@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -10,7 +9,7 @@ import (
 
 func main() {
 	// Reads the WebAssembly module as bytes.
-	bytes, _ := wasm.ReadBytes("../as/build/untouched.wasm")
+	bytes, _ := wasm.ReadBytes("../as/build/optimized.wasm")
 
 	module, _ := wasm.Compile(bytes)
 
@@ -25,7 +24,7 @@ func main() {
 	instance, _ := module.InstantiateWithImportObject(importObject)
 	add := instance.Exports["add"]
 	result, _ := add(5, 37)
-	fmt.Println(result)
+	log.Println(result)
 
 	// test of allocating memory, writing an array and having the wasm function sum the elements in the array
 	tstArr := []uint8{2, 4, 6}
@@ -73,5 +72,6 @@ func main() {
 		i++
 	}
 
-	fmt.Println(output.String())
+	log.Println(output.String())
+
 }
