@@ -2,8 +2,10 @@
 //import { wasi_abort } from "../node_modules/as-wasi/assembly/as-wasi";
 import { Console } from "../node_modules/as-wasi/assembly";
 
+
+declare function stringFromHost(): usize;
+
 export function add(a: i32, b: i32): i32 {
-  Console.log("FOOOO");
   return a + b;
 }
 
@@ -30,6 +32,17 @@ export function array_sum(buf_ptr: usize, len: i32): u8 {
 }
 
 export function returnString(): ArrayBuffer {
+  
+  // sticking this here to test calling a host provided function
+  // that modifies memory
+  let strBuf = new Array<i32>(40);
+  let buf_ptr = stringFromHost();
+  for(let i = 0; i < 40; i++) {
+    strBuf[i] = load<u8>(buf_ptr + i) as i32;
+  }
+  let val = String.fromCharCodes(strBuf);
+  Console.log(val);
+
   let test = "This is a test of the emergency broadcast system";
   let str = String.UTF8.encode(test, true)
   return str;
