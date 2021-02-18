@@ -18,7 +18,8 @@ func main() {
 	store := wasmtime.NewStore(wasmtime.NewEngine())
 	linker := wasmtime.NewLinker(store)
 
-	bytes, _ := ioutil.ReadFile("../as/build/optimized.wasm")
+	//bytes, _ := ioutil.ReadFile("../as/build/optimized.wasm")
+	bytes, _ := ioutil.ReadFile("../tinygo/wasm.wasm")
 	// Once we have our binary `wasm` we can compile that into a `*Module`
 	// which represents compiled JIT code.
 	module, err := wasmtime.NewModule(store.Engine, bytes)
@@ -45,11 +46,16 @@ func main() {
 	wasiConfig.InheritStdout()
 	wasiConfig.InheritStderr()
 
-	wasi, err := wasmtime.NewWasiInstance(store, wasiConfig, "wasi_snapshot_preview1")
+	// assemblyscript generates the wasi interface wasi_snapshot_preview1
+	//wasi, err := wasmtime.NewWasiInstance(store, wasiConfig, "wasi_snapshot_preview1")
+	// tinygo generates the wasi interface with `wasi_unstable`
+	wasi, err := wasmtime.NewWasiInstance(store, wasiConfig, "wasi_unstable")
 	check(err)
 	err = linker.DefineWasi(wasi)
 	check(err)
+	// assemblyscript (atleast my sample code) generates the import against `index`
 	linker.DefineFunc("index", "stringFromHost", strFromGoFn)
+	linker.DefineFunc("env", "stringFromHost", strFromGoFn)
 
 	instance, err := linker.Instantiate(module)
 	check(err)
@@ -62,7 +68,7 @@ func main() {
 
 	log.Println(result)
 
-	tstArr := []uint8{2, 9, 1}
+	tstArr := []uint8{9, 9, 9}
 	alloc = instance.GetExport("alloc").Func()
 	// ptr is a pointer to a block of memory we've allocated on the wasm side
 	ptr, err := alloc.Call(3)
