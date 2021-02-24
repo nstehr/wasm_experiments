@@ -1,7 +1,7 @@
 // The entry file of your WebAssembly module.
 //import { wasi_abort } from "../node_modules/as-wasi/assembly/as-wasi";
 import { Console } from "../node_modules/as-wasi/assembly";
-
+import { JSON } from "assemblyscript-json"; 
 
 declare function stringFromHost(): usize;
 
@@ -46,5 +46,23 @@ export function returnString(): ArrayBuffer {
   let test = "This is a test of the emergency broadcast system";
   let str = String.UTF8.encode(test, true)
   return str;
+}
+
+export function execute(buf_ptr: usize, len: i32): void {
+  let buf = new Array<i32>(len);
+  for(let i = 0; i < len; i++) {
+    buf[i] = load<u8>(buf_ptr + i) as i32;
+  }
+  let s = String.fromCharCodes(buf);
+  Console.log(s);
+  let val: JSON.Obj = <JSON.Obj>JSON.parse(s);
+  let worldOrNull: JSON.Str | null = val.getString("Id"); // This will return a JSON.Str or null
+  if (worldOrNull != null) {
+      // use .valueOf() to turn the high level JSON.Str type into a string
+      let world: string = worldOrNull.valueOf();
+      Console.log(world);
+  }
+
+  
 }
 

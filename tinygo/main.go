@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"unsafe"
+
+	"github.com/buger/jsonparser"
 )
 
 // This function is imported from host
@@ -38,6 +40,7 @@ func returnString() *uint8 {
 	ptr := StringFromHost()
 	val := rawBytePtrToByteSlice(ptr, 40)
 	fmt.Println(string(val))
+
 	test := "This is a test of the emergency broadcast system"
 	arr := make([]byte, len(test)+1)
 	for i := 0; i < len(test); i++ {
@@ -50,6 +53,13 @@ func returnString() *uint8 {
 func alloc(length int) *uint8 {
 	buf := make([]byte, length)
 	return &buf[0]
+}
+
+//go:export execute
+func execute(bufPtr *byte, len int) {
+	tst := rawBytePtrToByteSlice(bufPtr, len)
+	str, _ := jsonparser.GetString(tst, "Id")
+	fmt.Println(str)
 }
 
 // https://github.com/tetratelabs/proxy-wasm-go-sdk/blob/d91a09b6807cd8a9726a9653478428067e413d8e/proxywasm/hostcall_utils_go.go#L36

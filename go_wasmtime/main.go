@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -9,6 +10,15 @@ import (
 )
 
 func main() {
+
+	type Nic struct {
+		Mac string
+		IP  string
+	}
+	type Device struct {
+		Id   string
+		Nics []Nic
+	}
 
 	var mem *wasmtime.Memory
 	var alloc *wasmtime.Func
@@ -90,6 +100,25 @@ func main() {
 	check(err)
 	// enjoy the results
 	log.Println(result)
+
+	d := Device{}
+	n1 := Nic{Mac: "abs:123", IP: "1.2.2.3"}
+	n2 := Nic{Mac: "abs:444", IP: "2.2.2.3"}
+	d.Nics = []Nic{n1, n2}
+	d.Id = "Device1"
+
+	data, err := json.Marshal(&d)
+	check(err)
+	ptr, err = alloc.Call(len(data))
+	check(err)
+	memory = mem.UnsafeData()[int(ptr.(int32)):]
+
+	// copy our array into that memory
+	for i := 0; i < len(data); i++ {
+		memory[i] = data[i]
+	}
+	execute := instance.GetExport("execute").Func()
+	execute.Call(ptr, len(data))
 
 	returnStr := instance.GetExport("returnString").Func()
 	ptr, err = returnStr.Call()

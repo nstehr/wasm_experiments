@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "@assemblyscript/loader": "^0.9.4",
-    "as-wasi": "0.0.1"
+    "as-wasi": "0.0.1",
+    "assemblyscript-json": "^1.0.0"
   },
   "devDependencies": {
     "assemblyscript": "^0.14.10"
